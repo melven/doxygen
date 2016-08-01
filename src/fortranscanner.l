@@ -441,6 +441,11 @@ SCOPENAME ({ID}{BS}"::"{BS})*
                                           DBG_CTX((stderr,"using dir %s\n",yytext));
                                           current->name=yytext;
                                           current->fileName = yyFileName; 
+                                          current->section=Entry::USINGDECL_SEC;
+                                          addCurrentEntry(1);
+                                          // also add a using directive
+                                          current->name=yytext;
+                                          current->fileName = yyFileName; 
                                           current->section=Entry::USINGDIR_SEC;
                                           addCurrentEntry(1);
                                           yy_pop_state();
@@ -456,7 +461,12 @@ SCOPENAME ({ID}{BS}"::"{BS})*
                                           current->fileName = yyFileName; 
                                           current->section=Entry::USINGDECL_SEC;
                                           addCurrentEntry(1);
-                                        }
+                                          // also add a using directive
+                                          current->name= useModuleName+"::"+yytext;
+                                          current->fileName = yyFileName; 
+                                          current->section=Entry::USINGDIR_SEC;
+                                          addCurrentEntry(1);
+  					                            }
 <Use,UseOnly>"\n"                       {
 					  yyColNr -= 1;
                                           unput(*yytext);
