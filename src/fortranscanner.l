@@ -217,6 +217,7 @@ static void startScope(Entry *scope);
 static bool endScope(Entry *scope, bool isGlobalRoot=FALSE);
 //static bool isTypeName(QCString name);
 static void resolveModuleProcedures(QList<Entry> &moduleProcedures, Entry *current_root);
+static void resolveTypeBoundProcedures(Entry *scope);
 static int getAmpersandAtTheStart(const char *buf, int length);
 static int getAmpOrExclAtTheEnd(const char *buf, int length, char ch);
 static void truncatePrepass(int index);
@@ -673,26 +674,31 @@ private                                 {
 {COMMA}                                 {
                                         }
 {ATTR_SPEC}                             {
-                                          currentModifiers |= QCString(yytext);
+                                          currentModifiers |= QCString(yytext).stripWhiteSpace();
                                         }
 {BS}"::"{BS}                            {
                                         }
 {ID}                                    {
-                                          QCString name = yytext;
-                                          modifiers[current_root][name.lower()] |= currentModifiers;
+                                          QCString name = QCString(yytext).lower();
+                                          modifiers[current_root][name] |= currentModifiers;
                                           current->section  = Entry::FUNCTION_SEC;
                                           current->name     = name;
+                                          current->args     = name; // target procedure name if no => is given
                                           current->fileName = yyFileName;
                                           current->bodyLine = yyLineNr;
                                           current->startLine  = yyLineNr;
                                           addCurrentEntry(1);
                                         }
 {BS}"=>"[^(\n|\!)]*                     { /* Specific bindings come after the ID. */
-                                          last_entry->args = yytext;
+                                          QCString tmp = yytext;
+                                          int i = tmp.find("=>");
+                                          if( i != -1 )
+                                            tmp.remove(0, i+2);
+                                          last_entry->args = tmp.simplifyWhiteSpace().lower();
                                         }
 "\n"                                    {
                                           currentModifiers = SymbolModifiers();
-					  newLine();
+                                          newLine();
                                           docBlock.resize(0);
                                         }
 }
@@ -1890,7 +1896,7 @@ static Argument *findArgument(Entry* subprog, QCString name, bool byTypeName = F
   {
     Argument *arg = subprog->argList->at(i);
     if ((!byTypeName && arg->name.lower() == cname) ||
-	(byTypeName && arg->type.lower() == cname)
+        (byTypeName && arg->type.lower() == cname)
        )
     {
       return arg;
@@ -2049,6 +2055,11 @@ static void applyModifiers(Entry *ent, SymbolModifiers& mdfs)
     ent->protection = Public;
   else if (mdfs.protection == SymbolModifiers::PRIVATE)
     ent->protection = Private;
+
+  if (mdfs.nonoverridable)
+    ent->spec |= Entry::Final;
+  if (mdfs.nopass)
+    ent->stat = TRUE;
 }
 
 /*! Starts the new scope in fortran program. Consider using this function when
@@ -2167,7 +2178,7 @@ static bool endScope(Entry *scope, bool isGlobalRoot)
     Entry *ce;
     for (;(ce=eli.current());++eli) 
     {
-      if (ce->section != Entry::VARIABLE_SEC && ce->section != Entry::FUNCTION_SEC && ce->section != Entry::CLASS_SEC && ce->section != Entry::FUNCTION_SEC)
+      if (ce->section != Entry::VARIABLE_SEC && ce->section != Entry::FUNCTION_SEC && ce->section != Entry::CLASS_SEC)
         continue;
 
       //cout<<ce->name<<", "<<mdfsMap.contains(ce->name.lower())<<mdfsMap.count()<<endl;
@@ -2187,8 +2198,75 @@ static bool endScope(Entry *scope, bool isGlobalRoot)
   // clear all modifiers of the scope
   modifiers.remove(scope);
 
+  // resolve procedures in types
+  resolveTypeBoundProcedures(scope);
+
   return TRUE;
 }
+
+
+/*! search for types with type bound procedures (e.g. methods)
+ *  and try to resolve their arguments
+ */
+static void resolveTypeBoundProcedures(Entry *scope)
+{
+  // map of all subroutines/functions
+  bool procMapCreated = false;
+  QMap<QCString,Entry*> procMap;
+
+  // iterate over all types
+  EntryListIterator eli(*scope->children());
+  Entry *ce = NULL;
+  for (;(ce=eli.current());++eli)
+  {
+    if (ce->section != Entry::CLASS_SEC)
+      continue;
+
+    EntryListIterator elj(*ce->children());
+    Entry *ct;
+    for (;(ct=elj.current());++elj)
+    {
+      if (ct->section != Entry::FUNCTION_SEC)
+        continue;
+
+      // set up the procMap
+      if (!procMapCreated)
+      {
+        EntryListIterator elk(*scope->children());
+        Entry *cf;
+        for (;(cf=elk.current());++elk)
+        {
+          if (cf->section == Entry::FUNCTION_SEC)
+          {
+            procMap.insert(cf->name, cf);
+          }
+        }
+        procMapCreated = true;
+      }
+
+      // found a method
+      if (ct->type=="generic")
+      {
+        // TODO
+      }
+      else
+      {
+        QCString implName = ct->args;
+        if( procMap.contains(implName) )
+        {
+          Entry* proc = procMap[implName];
+          ct->args = proc->args;
+          ct->argList = new ArgumentList(*proc->argList);
+          for(int i = 0; i < ct->argList->count(); i++)
+          {
+            printf("arg %d: type: %s, name: %s\n", i, ct->argList->at(i)->type.data(), ct->argList->at(i)->name.data());
+          }
+        }
+      }
+    }
+  }
+}
+
 
 #if 0
 //! Return full name of the entry. Sometimes we must combine several names recursively.
