@@ -15,6 +15,8 @@ module myModule
     procedure, non_overridable :: secondProc => secondProc_impl
     procedure, nopass :: staticProc
     procedure, pass(this) :: redundantPass => firstProc
+    generic :: overloadedProc => firstProc, secondProc
+    final :: destructor
   end type T1
 
 contains
@@ -31,6 +33,10 @@ contains
 
   subroutine staticProc(someArg)
     integer :: someArg
+  end subroutine
+
+  elemental subroutine destructor(this)
+    type(T1), intent(inout) :: this
   end subroutine
 
 end module myModule
