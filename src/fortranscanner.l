@@ -1697,7 +1697,11 @@ static void copyEntry(Entry *dest, Entry *src)
    dest->args     = src->args;
    dest->argList  = new ArgumentList(*src->argList);
    dest->doc      = src->doc;
+   dest->docLine  = src->docLine;
+   dest->docFile  = src->docFile;
    dest->brief    = src->brief;
+   dest->briefLine= src->briefLine;
+   dest->briefFile= src->briefFile;
 }
 
 /** fill empty interface module procedures with info from 
@@ -2278,6 +2282,18 @@ static void resolveTypeBoundProcedures(Entry *scope)
           Entry* proc = procMap[implName];
           ct->args = proc->args;
           ct->argList = new ArgumentList(*proc->argList);
+          if (!ct->brief)
+          {
+            ct->brief = proc->brief;
+            ct->briefLine = proc->briefLine;
+            ct->briefFile = proc->briefFile;
+          }
+          if (!ct->doc)
+          {
+            ct->doc = proc->doc;
+            ct->docLine = proc->docLine;
+            ct->docFile = proc->docFile;
+          }
         }
         methodMap.insert(ct->name, ct);
       }
@@ -2302,6 +2318,18 @@ static void resolveTypeBoundProcedures(Entry *scope)
           Entry* method = methodMap[methodName];
           ct->args = method->args;
           ct->argList = new ArgumentList(*method->argList);
+          if (!ct->brief)
+          {
+            ct->brief = method->brief;
+            ct->briefLine = method->briefLine;
+            ct->briefFile = method->briefFile;
+          }
+          if (!ct->doc)
+          {
+            ct->doc = method->doc;
+            ct->docLine = method->docLine;
+            ct->docFile = method->docFile;
+          }
         }
       }
     }
