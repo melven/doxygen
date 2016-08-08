@@ -32,12 +32,33 @@
           <defname>i</defname>
         </param>
         <briefdescription>
+          <para>brief doc </para>
         </briefdescription>
         <detaileddescription>
+          <para>
+            <parameterlist kind="param">
+              <parameteritem>
+                <parameternamelist>
+                  <parametername>this</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>this pointer</para>
+                </parameterdescription>
+              </parameteritem>
+              <parameteritem>
+                <parameternamelist>
+                  <parametername direction="in">i</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>integer argument </para>
+                </parameterdescription>
+              </parameteritem>
+            </parameterlist>
+          </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="14" column="1" bodyfile="076_type_with_procedures.f03" bodystart="14" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="15" column="1" bodyfile="076_type_with_procedures.f03" bodystart="15" bodyend="-1"/>
       </memberdef>
       <memberdef kind="function" id="structmymodule_1_1t1_1a46ef6a488a930d0a20a3b36eb268e65e" prot="public" static="no" const="no" explicit="no" inline="no" final="yes" virt="non-virtual">
         <type>procedure, non_overridable</type>
@@ -58,7 +79,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="15" column="1" bodyfile="076_type_with_procedures.f03" bodystart="15" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="16" column="1" bodyfile="076_type_with_procedures.f03" bodystart="16" bodyend="-1"/>
       </memberdef>
       <memberdef kind="function" id="structmymodule_1_1t1_1a1f5d3b587c25b0cd8482ede135585bb5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>procedure, pass(this)</type>
@@ -74,12 +95,33 @@
           <defname>i</defname>
         </param>
         <briefdescription>
+          <para>another brief doc </para>
         </briefdescription>
         <detaileddescription>
+          <para>
+            <parameterlist kind="param">
+              <parameteritem>
+                <parameternamelist>
+                  <parametername>this</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>this pointer</para>
+                </parameterdescription>
+              </parameteritem>
+              <parameteritem>
+                <parameternamelist>
+                  <parametername direction="in">i</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>integer argument </para>
+                </parameterdescription>
+              </parameteritem>
+            </parameterlist>
+          </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="17" column="1" bodyfile="076_type_with_procedures.f03" bodystart="17" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="18" column="1" bodyfile="076_type_with_procedures.f03" bodystart="18" bodyend="-1"/>
       </memberdef>
       <memberdef kind="function" id="structmymodule_1_1t1_1aae1fc16baab92e2262c25b49fdff8845" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>generic</type>
@@ -95,12 +137,33 @@
           <defname>i</defname>
         </param>
         <briefdescription>
+          <para>brief doc </para>
         </briefdescription>
         <detaileddescription>
+          <para>
+            <parameterlist kind="param">
+              <parameteritem>
+                <parameternamelist>
+                  <parametername>this</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>this pointer</para>
+                </parameterdescription>
+              </parameteritem>
+              <parameteritem>
+                <parameternamelist>
+                  <parametername direction="in">i</parametername>
+                </parameternamelist>
+                <parameterdescription>
+                  <para>integer argument </para>
+                </parameterdescription>
+              </parameteritem>
+            </parameterlist>
+          </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="18" column="1" bodyfile="076_type_with_procedures.f03" bodystart="18" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="19" column="1" bodyfile="076_type_with_procedures.f03" bodystart="19" bodyend="-1"/>
       </memberdef>
       <memberdef kind="function" id="structmymodule_1_1t1_1a5aab3898edef16a90442c6d1af3990ef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>generic</type>
@@ -121,7 +184,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="18" column="1" bodyfile="076_type_with_procedures.f03" bodystart="18" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="19" column="1" bodyfile="076_type_with_procedures.f03" bodystart="19" bodyend="-1"/>
       </memberdef>
       <memberdef kind="function" id="structmymodule_1_1t1_1a69844b06186021c87dc0eccea9265d43" prot="public" static="no" const="no" explicit="no" inline="no" final="yes" virt="non-virtual">
         <type>final</type>
@@ -138,7 +201,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="19" column="1" bodyfile="076_type_with_procedures.f03" bodystart="19" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="20" column="1" bodyfile="076_type_with_procedures.f03" bodystart="20" bodyend="-1"/>
       </memberdef>
     </sectiondef>
     <sectiondef kind="public-static-func">
@@ -157,14 +220,14 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="076_type_with_procedures.f03" line="16" column="1" bodyfile="076_type_with_procedures.f03" bodystart="16" bodyend="-1"/>
+        <location file="076_type_with_procedures.f03" line="17" column="1" bodyfile="076_type_with_procedures.f03" bodystart="17" bodyend="-1"/>
       </memberdef>
     </sectiondef>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="076_type_with_procedures.f03" line="11" column="1" bodyfile="076_type_with_procedures.f03" bodystart="11" bodyend="20"/>
+    <location file="076_type_with_procedures.f03" line="11" column="1" bodyfile="076_type_with_procedures.f03" bodystart="11" bodyend="21"/>
     <listofallmembers>
       <member refid="structmymodule_1_1t1_1a69844b06186021c87dc0eccea9265d43" prot="public" virt="non-virtual">
         <scope>mymodule::t1</scope>
