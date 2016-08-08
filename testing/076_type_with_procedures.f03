@@ -11,19 +11,21 @@ module myModule
   type T1
     integer :: publicVariable
   contains
+    !> brief doc
     procedure :: firstProc
     procedure, non_overridable :: secondProc => secondProc_impl
     procedure, nopass :: staticProc
-    procedure, pass(this) :: redundantPass => firstProc
+    procedure, pass(this) :: redundantPass => firstProc !< another brief doc
     generic :: overloadedProc => firstProc, secondProc
     final :: destructor
   end type T1
 
 contains
 
+  !> short doc
   subroutine firstProc(this, i)
-    class(T1) :: this
-    integer, intent(in) :: i
+    class(T1) :: this !< this pointer
+    integer, intent(in) :: i !< integer argument
   end subroutine
 
   subroutine secondProc_impl(this, r)
