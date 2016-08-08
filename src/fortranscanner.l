@@ -213,6 +213,7 @@ static void initEntry();
 static void startScope(Entry *scope);
 static bool endScope(Entry *scope, bool isGlobalRoot=FALSE);
 //static bool isTypeName(QCString name);
+static void copyEntry(Entry *dest, Entry *src);
 static void resolveModuleProcedures(QList<Entry> &moduleProcedures, Entry *current_root);
 static void resolveTypeBoundProcedures(Entry *scope);
 static int getAmpersandAtTheStart(const char *buf, int length);
@@ -691,7 +692,27 @@ private                                 {
                                           int i = tmp.find("=>");
                                           if( i != -1 )
                                             tmp.remove(0, i+2);
-                                          last_entry->args = tmp.simplifyWhiteSpace().lower();
+                                          tmp = tmp.simplifyWhiteSpace().lower();
+                                          if( last_entry->type == "generic")
+                                          {
+                                            // duplicate entries for each overloaded variant
+                                            // (parse through medhod1,method2, methodN, ...
+                                            //printf("Parsing through %s for generic method %s.\n", tmp.data(), last_entry->name.data());
+                                            int i = tmp.find(",");
+                                            while(i > 0)
+                                            {
+                                              copyEntry(current, last_entry);
+                                              current->name = last_entry->name;
+                                              current->section = Entry::FUNCTION_SEC;
+                                              last_entry->args = tmp.left(i).stripWhiteSpace();
+                                              //printf("Found %s.\n", last_entry->args.data());
+                                              addCurrentEntry(1);
+                                              tmp = tmp.remove(0,i+1).stripWhiteSpace();
+                                              i = tmp.find(",");
+                                            }
+                                          }
+                                          //printf("Target function: %s\n", tmp.data());
+                                          last_entry->args = tmp;
                                         }
 "\n"                                    {
                                           currentModifiers = SymbolModifiers();
@@ -2219,45 +2240,65 @@ static void resolveTypeBoundProcedures(Entry *scope)
     if (ce->section != Entry::CLASS_SEC)
       continue;
 
-    EntryListIterator elj(*ce->children());
-    Entry *ct;
-    for (;(ct=elj.current());++elj)
+    // handle non-"generic" methods, copying the arguments from the implementation
+    QMap<QCString,Entry*> methodMap;
     {
-      if (ct->section != Entry::FUNCTION_SEC)
-        continue;
-
-      // set up the procMap
-      if (!procMapCreated)
+      EntryListIterator elj(*ce->children());
+      Entry *ct;
+      for (;(ct=elj.current());++elj)
       {
-        EntryListIterator elk(*scope->children());
-        Entry *cf;
-        for (;(cf=elk.current());++elk)
+        if (ct->section != Entry::FUNCTION_SEC)
+          continue;
+
+        if (ct->type=="generic")
+          continue;
+
+        // set up the procMap
+        if (!procMapCreated)
         {
-          if (cf->section == Entry::FUNCTION_SEC)
+          EntryListIterator elk(*scope->children());
+          Entry *cf;
+          for (;(cf=elk.current());++elk)
           {
-            procMap.insert(cf->name, cf);
+            if (cf->section == Entry::FUNCTION_SEC)
+            {
+              procMap.insert(cf->name, cf);
+            }
           }
+          procMapCreated = true;
         }
-        procMapCreated = true;
-      }
 
-      // found a method
-      if (ct->type=="generic")
-      {
-        // TODO
-      }
-      else
-      {
+        // found a (non-generic) method
         QCString implName = ct->args;
         if( procMap.contains(implName) )
         {
           Entry* proc = procMap[implName];
           ct->args = proc->args;
           ct->argList = new ArgumentList(*proc->argList);
-          for(int i = 0; i < ct->argList->count(); i++)
-          {
-            printf("arg %d: type: %s, name: %s\n", i, ct->argList->at(i)->type.data(), ct->argList->at(i)->name.data());
-          }
+        }
+        methodMap.insert(ct->name, ct);
+      }
+    }
+
+    // handle "generic" methods (that is function overloading!), duplicating with arguments from the target method of the type
+    {
+      EntryListIterator elj(*ce->children());
+      Entry *ct;
+      for (;(ct=elj.current());++elj)
+      {
+        if (ct->section != Entry::FUNCTION_SEC)
+          continue;
+
+        if (ct->type!="generic")
+          continue;
+
+        // found a generic method (already duplicated for each entry by the parser)
+        QCString methodName = ct->args;
+        if( methodMap.contains(methodName) )
+        {
+          Entry* method = methodMap[methodName];
+          ct->args = method->args;
+          ct->argList = new ArgumentList(*method->argList);
         }
       }
     }
