@@ -212,6 +212,7 @@ static void addInterface(QCString name, InterfaceType type);
 static Argument *getParameter(const QCString &name);
 static void scanner_abort();
 
+static void initEntry();
 static void startScope(Entry *scope);
 static bool endScope(Entry *scope, bool isGlobalRoot=FALSE);
 //static bool isTypeName(QCString name);
@@ -496,12 +497,15 @@ SCOPENAME ({ID}{BS}"::"{BS})*
 
 <InterfaceBody>^{BS}end{BS}interface({BS_}{ID})? {
                                           // end scope only if GENERIC interface
-                                          if (ifType == IF_GENERIC)last_entry->parent()->endBodyLine = yyLineNr - 1;
-                                          if (ifType == IF_GENERIC && !endScope(current_root))
-                                            yyterminate();
+                                          if (ifType == IF_GENERIC)
+                                          {
+                                            last_entry->parent()->endBodyLine = yyLineNr - 1;
+                                            typeMode = false;
+                                            if (!endScope(current_root))
+                                              yyterminate();
+                                          }
 
                                           ifType = IF_NONE;
-                                          typeMode = false;
                                           yy_pop_state();
                                         }
 <InterfaceBody>module{BS}procedure      { yy_push_state(YY_START);
@@ -693,9 +697,9 @@ private                                 {
 <TypedefBody,TypedefBodyContains>{
 ^{BS}"end"{BS}"type"({BS_}{ID})?{BS}/(\n|!) { /* end type definition */
                                           last_entry->parent()->endBodyLine = yyLineNr;
+                                          typeMode = false;
                                           if (!endScope(current_root))
                                             yyterminate();
-                                          typeMode = false;
                                           yy_pop_state();
                                         }
 }
@@ -710,16 +714,17 @@ private                                 {
                                            //
                                            if (ifType == IF_ABSTRACT || ifType == IF_SPECIFIC)
                                            {
+                                             typeMode = false;
                                              endScope(current_root);
                                              last_entry->endBodyLine = yyLineNr - 1;
                                            }
                                            current_root->endBodyLine = yyLineNr - 1;
 
-					   if (!endScope(current_root))
-					     yyterminate();
+                                           if (!endScope(current_root))
+                                             yyterminate();
                                            subrCurrent.remove(0u);
-					   yy_pop_state() ;
-				        }
+                                           yy_pop_state() ;
+                                        }
 <BlockData>{
 {ID}                                    {
                                         }
@@ -931,9 +936,30 @@ private                                 {
   					}
 <Variable>{ARGS}			{ /* dimension of the previous entry. */
 					  QCString name(argName);
-					  QCString attr("dimension");
-					  attr += yytext;
-					  modifiers[current_root][name.lower()] |= attr;
+            // check for special case: public/private statements for operator(....)
+            bool isOperator = false;
+            if (name.findRev("operator") == name.size()-QCString("operator").size())
+            {
+              // still not sure, operator is a valid name, check yytext
+              QRegExp opName("^\\(\\.[a-zA-Z]\\.\\)$");
+              QRegExp opSymb("^\\([/=<>+*-]+\\)$");
+              QCString opText = QCString(yytext).stripWhiteSpace();
+              if (opName.match(opText)) isOperator = true;
+              if (opSymb.match(opText)) isOperator = true;
+            }
+            if( isOperator )
+            {
+              //printf("Found op %s\n", QCString(yytext));
+              current->name += QCString(yytext).stripWhiteSpace().lower();
+              argName += QCString(yytext).stripWhiteSpace().lower();
+					    modifiers[current_root][argName.lower()] |= currentModifiers;
+            }
+            else
+            {
+              QCString attr("dimension");
+              attr += yytext;
+              modifiers[current_root][name.lower()] |= attr;
+            }
 					}
 <Variable>{COMMA}	                { //printf("COMMA: %d<=..<=%d\n", yyColNr-(int)yyleng, yyColNr);
 					  // locate !< comment
@@ -1010,6 +1036,8 @@ private                                 {
 <Start,ModuleBody,SubprogBody,InterfaceBody,ModuleBodyContains,SubprogBodyContains>^{BS}({PREFIX}{BS_})?{TYPE_SPEC}{BS}({PREFIX}{BS_})?/{SUBPROG}{BS_} {
                                          if (ifType == IF_ABSTRACT || ifType == IF_SPECIFIC)
                                          {
+                                           typeProtection = Public;
+                                           typeMode = true;
                                            addInterface("$interface$", ifType);
                                            startScope(last_entry);
                                          }
@@ -1027,8 +1055,8 @@ private                                 {
                                          result=result.stripWhiteSpace();
                                          addSubprogram(result);
                                          BEGIN(Subprog);
-				         current->bodyLine = yyLineNr + lineCountPrepass + 1; // we have to be at the line after the definition and we have to take continuation lines into account.
-				         current->startLine = yyLineNr;
+                                         current->bodyLine = yyLineNr + lineCountPrepass + 1; // we have to be at the line after the definition and we have to take continuation lines into account.
+                                         current->startLine = yyLineNr;
                                        }
 
 <Start,ModuleBody,SubprogBody,InterfaceBody,ModuleBodyContains,SubprogBodyContains>^{BS}({PREFIX}{BS_})?{SUBPROG}{BS_} {
@@ -1036,6 +1064,8 @@ private                                 {
                                          v_type = V_IGNORE;
                                          if (ifType == IF_ABSTRACT || ifType == IF_SPECIFIC)
                                          {
+                                           typeProtection = Public;
+                                           typeMode = true;
                                            addInterface("$interface$", ifType);
                                            startScope(last_entry);
                                          }
@@ -2044,6 +2074,11 @@ static void startScope(Entry *scope)
 
   QMap<QCString,SymbolModifiers> mdfMap;
   modifiers.insert(scope, mdfMap);
+
+  // create new current with possibly different defaults...
+  delete current;
+  current = new Entry;
+  initEntry();
 }
 
 /*! Ends scope in fortran program: may update subprogram arguments or module variable attributes.
@@ -2062,6 +2097,11 @@ static bool endScope(Entry *scope, bool isGlobalRoot)
     scanner_abort();
     return FALSE;
   }
+
+  // create new current with possibly different defaults...
+  delete current;
+  current = new Entry;
+  initEntry();
 
   // update variables or subprogram arguments with modifiers
   QMap<QCString,SymbolModifiers>& mdfsMap = modifiers[scope];
@@ -2256,6 +2296,10 @@ static void addSubprogram(const char *text)
   functionLine = (subtype.find("function") != -1);
   current->type += " " + subtype;
   current->type = current->type.stripWhiteSpace();
+  if (ifType == IF_ABSTRACT)
+  {
+    current->virt = Virtual;
+  }
   current->fileName  = yyFileName;
   current->bodyLine  = yyLineNr; // used for source reference start of body of routine
   current->startLine  = yyLineNr; // used for source reference start of definition
