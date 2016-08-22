@@ -660,7 +660,7 @@ private                                 {
 
 <TypedefBodyContains>{                  /* Type Bound Procedures */
 ^{BS}PROCEDURE{ARGS}?                   {
-                                          current->type = QCString(yytext).simplifyWhiteSpace();
+                                          current->type = QCString(yytext).simplifyWhiteSpace().lower();
                                         }
 ^{BS}final                              {
                                           current->spec |= Entry::Final;
@@ -681,7 +681,15 @@ private                                 {
                                           modifiers[current_root][name] |= currentModifiers;
                                           current->section  = Entry::FUNCTION_SEC;
                                           current->name     = name;
-                                          current->args     = name; // target procedure name if no => is given
+                                          // check for procedure(name)
+                                          if (current->type.find('(') != -1)
+                                          {
+                                            current->args = extractFromParens(current->type).stripWhiteSpace();
+                                          }
+                                          else
+                                          {
+                                            current->args = name; // target procedure name if no => is given
+                                          }
                                           current->fileName = yyFileName;
                                           current->bodyLine = yyLineNr;
                                           current->startLine  = yyLineNr;
@@ -2082,6 +2090,8 @@ static void applyModifiers(Entry *ent, SymbolModifiers& mdfs)
     ent->spec |= Entry::Final;
   if (mdfs.nopass)
     ent->stat = TRUE;
+  if (mdfs.deferred)
+    ent->virt = Pure;
 }
 
 /*! Starts the new scope in fortran program. Consider using this function when
@@ -2236,6 +2246,10 @@ static void resolveTypeBoundProcedures(Entry *scope)
   bool procMapCreated = false;
   QMap<QCString,Entry*> procMap;
 
+  // map of all abstract interfaces
+  bool interfMapCreated = false;
+  QMap<QCString,Entry*> interfMap;
+
   // iterate over all types
   EntryListIterator eli(*scope->children());
   Entry *ce = NULL;
@@ -2244,7 +2258,7 @@ static void resolveTypeBoundProcedures(Entry *scope)
     if (ce->section != Entry::CLASS_SEC)
       continue;
 
-    // handle non-"generic" methods, copying the arguments from the implementation
+    // handle non-"generic" non-"deferred" methods, copying the arguments from the implementation
     QMap<QCString,Entry*> methodMap;
     {
       EntryListIterator elj(*ce->children());
@@ -2254,7 +2268,10 @@ static void resolveTypeBoundProcedures(Entry *scope)
         if (ct->section != Entry::FUNCTION_SEC)
           continue;
 
-        if (ct->type=="generic")
+        if (ct->type == "generic")
+          continue;
+
+        if (ct->virt == Pure)
           continue;
 
         // set up the procMap
@@ -2292,6 +2309,60 @@ static void resolveTypeBoundProcedures(Entry *scope)
             ct->docFile = proc->docFile;
           }
         }
+
+        methodMap.insert(ct->name, ct);
+      }
+    }
+
+    // handle "deferred" methods (pure virtual functions), duplicating with arguments from the target abstract interface
+    {
+      EntryListIterator elj(*ce->children());
+      Entry *ct;
+      for (;(ct=elj.current());++elj)
+      {
+        if (ct->section != Entry::FUNCTION_SEC)
+          continue;
+
+        if (ct->virt != Pure)
+          continue;
+
+        // set up the procMap
+        if (!interfMapCreated)
+        {
+          EntryListIterator elk(*scope->children());
+          Entry *cf;
+          for (;(cf=elk.current());++elk)
+          {
+            if (cf->section == Entry::CLASS_SEC && cf->spec & Entry::Interface && cf->type == "abstract")
+            {
+              Entry *ci = cf->children()->getFirst();
+              interfMap.insert(ci->name, ci);
+            }
+          }
+          interfMapCreated = true;
+        }
+
+        // found a (non-generic) method
+        QCString implName = ct->args;
+        if( interfMap.contains(implName) )
+        {
+          Entry* proc = interfMap[implName];
+          ct->args = proc->args;
+          ct->argList = new ArgumentList(*proc->argList);
+          if (!ct->brief)
+          {
+            ct->brief = proc->brief;
+            ct->briefLine = proc->briefLine;
+            ct->briefFile = proc->briefFile;
+          }
+          if (!ct->doc)
+          {
+            ct->doc = proc->doc;
+            ct->docLine = proc->docLine;
+            ct->docFile = proc->docFile;
+          }
+        }
+
         methodMap.insert(ct->name, ct);
       }
     }
