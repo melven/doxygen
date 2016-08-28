@@ -441,10 +441,8 @@ SCOPENAME ({ID}{BS}"::"{BS})*
                                           DBG_CTX((stderr,"using dir %s\n",yytext));
                                           current->name=yytext;
                                           current->fileName = yyFileName; 
-  					  current->section=Entry::USINGDIR_SEC;
-					  current_root->addSubEntry(current);
-					  current = new Entry;
-                                          current->lang = SrcLangExt_Fortran; 
+                                          current->section=Entry::USINGDIR_SEC;
+                                          addCurrentEntry(1);
                                           yy_pop_state();
                                         }
 <Use>{ID}/,                             { 
@@ -454,13 +452,11 @@ SCOPENAME ({ID}{BS}"::"{BS})*
                                         }           
 <UseOnly>{BS},{BS}                      {}
 <UseOnly>{ID}                           {
-  					  current->name= useModuleName+"::"+yytext;
+                                          current->name= useModuleName+"::"+yytext;
                                           current->fileName = yyFileName; 
-  					  current->section=Entry::USINGDECL_SEC;
-					  current_root->addSubEntry(current);
-					  current = new Entry ;
-                                          current->lang = SrcLangExt_Fortran; 
-  					}
+                                          current->section=Entry::USINGDECL_SEC;
+                                          addCurrentEntry(1);
+                                        }
 <Use,UseOnly>"\n"                       {
 					  yyColNr -= 1;
                                           unput(*yytext);
@@ -2222,13 +2218,13 @@ static void initEntry()
   {
     current->protection = Public;
   }
-  else if (current_root == NULL || current_root->section == Entry::NAMESPACE_SEC)
+  else if (current_root && current_root->section == Entry::FUNCTION_SEC)
   {
-    current->protection = defaultProtection;
+    current->protection = Private;
   }
   else
   {
-    current->protection = Private;
+    current->protection = defaultProtection;
   }
   current->mtype      = mtype;
   current->virt       = virt;
@@ -2648,10 +2644,8 @@ static void parseMain(const char *fileName,const char *fileBuf,Entry *rt, Fortra
     current->lang    = SrcLangExt_Fortran; 
     current->name    = yyFileName;
     current->section = Entry::SOURCE_SEC;
-    current_root->addSubEntry(current);
-    file_root        = current;
-    current          = new Entry;
-    current->lang    = SrcLangExt_Fortran; 
+    addCurrentEntry(0);
+    file_root        = last_entry;
 
     fortranscannerYYrestart( fortranscannerYYin );
     {
