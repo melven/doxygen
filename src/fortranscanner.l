@@ -2137,7 +2137,6 @@ static bool endScope(Entry *scope, bool isGlobalRoot)
             }
             arg->type = arg->type + ")";
           }
-          printf("New arg type: %s\n", arg->type.data());
         }
       }
       // clear all modifiers of the scope
