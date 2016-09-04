@@ -9,8 +9,8 @@
         <argsstring>(r)</argsstring>
         <name>externalproc</name>
         <param>
-          <type>r</type>
-          <defname>r</defname>
+          <type>real, intent(in)</type>
+          <declname>r</declname>
         </param>
         <briefdescription>
         </briefdescription>

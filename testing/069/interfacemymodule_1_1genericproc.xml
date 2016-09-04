@@ -9,8 +9,8 @@
         <argsstring>(i)</argsstring>
         <name>firstproc</name>
         <param>
-          <type>i</type>
-          <defname>i</defname>
+          <type>integer, intent(in)</type>
+          <declname>i</declname>
         </param>
         <briefdescription>
           <para>short doc </para>
@@ -39,8 +39,8 @@
         <argsstring>(somearg)</argsstring>
         <name>otherproc</name>
         <param>
-          <type>somearg</type>
-          <defname>somearg</defname>
+          <type>character(len=*), intent(in)</type>
+          <declname>somearg</declname>
         </param>
         <briefdescription>
         </briefdescription>
@@ -56,8 +56,8 @@
         <argsstring>(r)</argsstring>
         <name>externalproc2</name>
         <param>
-          <type>r</type>
-          <defname>r</defname>
+          <type>real, intent(out)</type>
+          <declname>r</declname>
         </param>
         <briefdescription>
         </briefdescription>

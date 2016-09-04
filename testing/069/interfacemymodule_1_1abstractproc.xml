@@ -9,8 +9,8 @@
         <argsstring>(logicalarg)</argsstring>
         <name>abstractproc</name>
         <param>
-          <type>logicalarg</type>
-          <defname>logicalarg</defname>
+          <type>logical, intent(out)</type>
+          <declname>logicalarg</declname>
         </param>
         <briefdescription>
         </briefdescription>
