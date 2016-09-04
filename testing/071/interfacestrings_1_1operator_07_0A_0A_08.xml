@@ -9,12 +9,12 @@
         <argsstring>(lhs, rhs)</argsstring>
         <name>compare</name>
         <param>
-          <type>lhs</type>
-          <defname>lhs</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), intent(in)</type>
+          <declname>lhs</declname>
         </param>
         <param>
-          <type>rhs</type>
-          <defname>rhs</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), intent(in)</type>
+          <declname>rhs</declname>
         </param>
         <briefdescription>
           <para>Implementation of OPERATOR(==) - compare two Strings. </para>
@@ -54,12 +54,12 @@
         <argsstring>(lhs, rhs)</argsstring>
         <name>compare_str</name>
         <param>
-          <type>lhs</type>
-          <defname>lhs</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), intent(in)</type>
+          <declname>lhs</declname>
         </param>
         <param>
-          <type>rhs</type>
-          <defname>rhs</defname>
+          <type>character(*,kind=ck), intent(in)</type>
+          <declname>rhs</declname>
         </param>
         <briefdescription>
           <para>Implementation of OPERATOR(==) - compare a String with a character scalar. </para>

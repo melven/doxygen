@@ -9,12 +9,12 @@
         <argsstring>(v, w)</argsstring>
         <name>cross_product</name>
         <param>
-          <type>v</type>
-          <defname>v</defname>
+          <type>real, dimension(3), intent(in)</type>
+          <declname>v</declname>
         </param>
         <param>
-          <type>w</type>
-          <defname>w</defname>
+          <type>real, dimension(3), intent(in)</type>
+          <declname>w</declname>
         </param>
         <briefdescription>
         </briefdescription>
