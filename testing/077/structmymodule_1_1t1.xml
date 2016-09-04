@@ -9,12 +9,12 @@
         <argsstring>(this, i)</argsstring>
         <name>deferredproc</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>), intent(inout)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>i</type>
-          <defname>i</defname>
+          <type>integer, intent(in)</type>
+          <declname>i</declname>
         </param>
         <briefdescription>
           <para>brief doc </para>

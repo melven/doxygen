@@ -3313,6 +3313,12 @@ static void addMethodToClass(EntryNav *rootNav,ClassDef *cd,
   md->setBodyDef(fd);
   md->setFileDef(fd);
   //md->setScopeTemplateArguments(root->tArgList);
+  // there is no difference between declaration and definition for Fortran function arguments!
+  if (root->lang == SrcLangExt_Fortran)
+  {
+    ArgumentList *args = md->argumentList() ? md->argumentList()->deepCopy() : 0;
+    md->setDeclArgumentList(args);
+  }
   md->addSectionsToDefinition(root->anchors);
   QCString def;
   QCString qualScope = cd->qualifiedNameWithTemplateParameters();
@@ -6727,6 +6733,12 @@ static void findMember(EntryNav *rootNav,
           md->setLanguage(root->lang);
           md->setId(root->id);
           //md->setMemberDefTemplateArguments(root->mtArgList);
+          // there is no difference between declaration and definition for Fortran function arguments!
+          if (root->lang == SrcLangExt_Fortran)
+          {
+            ArgumentList *args = md->argumentList() ? md->argumentList()->deepCopy() : 0;
+            md->setDeclArgumentList(args);
+          }
           mn->append(md);
           cd->insertMember(md);
           cd->insertUsedFile(fd);

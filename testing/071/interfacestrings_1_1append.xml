@@ -9,12 +9,12 @@
         <argsstring>(vector, item)</argsstring>
         <name>append_</name>
         <param>
-          <type>vector</type>
-          <defname>vector</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), dimension(:), intent(inout), allocatable</type>
+          <declname>vector</declname>
         </param>
         <param>
-          <type>item</type>
-          <defname>item</defname>
+          <type>character(*,kind=ck), intent(in)</type>
+          <declname>item</declname>
         </param>
         <briefdescription>
           <para>Adds a single item to the end of the vector of Strings. </para>
@@ -51,12 +51,12 @@
         <argsstring>(vector, item)</argsstring>
         <name>append_scalar</name>
         <param>
-          <type>vector</type>
-          <defname>vector</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), dimension(:), intent(inout), allocatable</type>
+          <declname>vector</declname>
         </param>
         <param>
-          <type>item</type>
-          <defname>item</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), intent(in)</type>
+          <declname>item</declname>
         </param>
         <briefdescription>
           <para>Adds a single item to the end of the vector of Strings. </para>
@@ -93,16 +93,16 @@
         <argsstring>(vector, items, mask)</argsstring>
         <name>append_vector</name>
         <param>
-          <type>vector</type>
-          <defname>vector</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), dimension(:), intent(inout), allocatable</type>
+          <declname>vector</declname>
         </param>
         <param>
-          <type>items</type>
-          <defname>items</defname>
+          <type>type(<ref refid="structstrings_1_1string" kindref="compound">string</ref>), dimension(:), intent(in)</type>
+          <declname>items</declname>
         </param>
         <param>
-          <type>mask</type>
-          <defname>mask</defname>
+          <type>logical, dimension(:), intent(in), optional</type>
+          <declname>mask</declname>
         </param>
         <briefdescription>
           <para>Appends a vector of Strings to another vector of Strings. </para>

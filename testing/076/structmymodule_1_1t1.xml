@@ -24,12 +24,12 @@
         <argsstring>(this, i)</argsstring>
         <name>firstproc</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>i</type>
-          <defname>i</defname>
+          <type>integer, intent(in)</type>
+          <declname>i</declname>
         </param>
         <briefdescription>
           <para>brief doc </para>
@@ -66,12 +66,12 @@
         <argsstring>(this, r)</argsstring>
         <name>secondproc</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>r</type>
-          <defname>r</defname>
+          <type>real, intent(out)</type>
+          <declname>r</declname>
         </param>
         <briefdescription>
         </briefdescription>
@@ -87,12 +87,12 @@
         <argsstring>(this, i)</argsstring>
         <name>redundantpass</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>i</type>
-          <defname>i</defname>
+          <type>integer, intent(in)</type>
+          <declname>i</declname>
         </param>
         <briefdescription>
           <para>another brief doc </para>
@@ -129,12 +129,12 @@
         <argsstring>(this, i)</argsstring>
         <name>overloadedproc</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>i</type>
-          <defname>i</defname>
+          <type>integer, intent(in)</type>
+          <declname>i</declname>
         </param>
         <briefdescription>
           <para>brief doc </para>
@@ -171,12 +171,12 @@
         <argsstring>(this, r)</argsstring>
         <name>overloadedproc</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>class(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>)</type>
+          <declname>this</declname>
         </param>
         <param>
-          <type>r</type>
-          <defname>r</defname>
+          <type>real, intent(out)</type>
+          <declname>r</declname>
         </param>
         <briefdescription>
         </briefdescription>
@@ -192,8 +192,8 @@
         <argsstring>(this)</argsstring>
         <name>destructor</name>
         <param>
-          <type>this</type>
-          <defname>this</defname>
+          <type>type(<ref refid="structmymodule_1_1t1" kindref="compound">t1</ref>), intent(inout)</type>
+          <declname>this</declname>
         </param>
         <briefdescription>
         </briefdescription>
@@ -211,8 +211,8 @@
         <argsstring>(somearg)</argsstring>
         <name>staticproc</name>
         <param>
-          <type>somearg</type>
-          <defname>somearg</defname>
+          <type>integer</type>
+          <declname>somearg</declname>
         </param>
         <briefdescription>
         </briefdescription>
